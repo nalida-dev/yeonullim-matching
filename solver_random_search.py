@@ -1,64 +1,8 @@
 import random
-import json
 
-class Problem:
-    def __init__(self, query):
-        self.problem = None
-        self.description = ''
-        self.parse_query(query)
+from problem import Problem
 
-    def parse_query(self, query):
-        try:
-            args = [[j.strip() for j in i.split()] for i in query.split(',')]
-
-            # validity check
-            # 1. 중복된 사람
-            alphabet = [i[0] for i in args] 
-            if len(alphabet) != len(set(alphabet)):
-                self.description = '뭔가 중복된 사람이 있는듯?'
-                return
-
-            # 2. 같은 사람 두 번 고름
-            if any([i[1] == i[2] for i in args]):
-                duplicated = next((i[0], i[1]) for i in args if i[1] == i[2])
-                self.description = '{}(이)가 {}(을)를 두 번 골랐네요'.format(duplicated[0], duplicated[1])
-                return
-
-            # 2-1. 자기를 고름
-            if any([i[0] == i[1] or i[0] == i[2] for i in args]):
-                duplicated = next(i[0] for i in args if i[0] == i[1] or i[0] == i[2])
-                self.description = '{}(이)가 자기를 골랐네요...'.format(duplicated)
-                return
-
-            # 3. 두 번 안 골라진 사람이 있음
-            # 4. 없는 사람을 고름
-            visited = [0] * len(alphabet)
-            for i in args:
-                if i[1] not in alphabet or i[2] not in alphabet:
-                    self.description = '{}(이)가 누구임???'.format(i[1] if i[1] not in alphabet else i[2])
-                    return
-                visited[alphabet.index(i[1])] += 1
-                visited[alphabet.index(i[2])] += 1
-            for i, val in enumerate(visited):
-                if val != 2:
-                    self.description = '{}(을)를 {}번 고름;;'.format(alphabet[i], val)
-                    return
-
-            self.problem = {
-                'alphabet': alphabet,
-                'graph': [[alphabet.index(i[1]), alphabet.index(i[2])] for i in args]
-            }
-            
-            descriptions = []
-            for d_from, (d_to_1, d_to_2) in enumerate(self.problem['graph']):
-                descriptions.append('{} -> {}, {}'.format(alphabet[d_from], alphabet[d_to_1], alphabet[d_to_2]))
-            self.description = '\n'.join(descriptions)
-        except:
-            self.problem = None
-            self.description = '형식에 맞게 적어주세요 ㅠㅠ'
-            
-
-class SolverPlain:
+class SolverRandomSearch:
     def __init__(self, problem):
         self.alphabet = problem.problem['alphabet']
         self.graph = problem.problem['graph']
@@ -123,3 +67,9 @@ class SolverPlain:
     def solve(self):
         groups = self.find_best_groups()
         return self.describe_solution()
+
+if __name__ == "__main__":
+    problem = Problem('주정 소소 냥냥, 편민 주정 냥냥, 소소 짱짱 주정, 짱짱 문졍 첸샤, 부엉 문졍 제제, 문졍 총총 짱짱, 첸샤 편민 강강, 총총 부엉 강강, 강강 제제 소소, 제제 총총 첸샤, 냥냥 부엉 편민, 1 2 3, 2 3 4, 3 4 5, 4 5 6, 5 6 7, 6 7 8, 7 8 9, 8 9 1, 9 1 2')
+    solver = SolverRandomSearch(problem)
+    print(solver.solve())
+

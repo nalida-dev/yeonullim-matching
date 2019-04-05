@@ -3,7 +3,9 @@ from threading import Thread
 import requests
 import sys
 
-from matching import Problem, SolverPlain
+from problem import Problem
+from solver_ga import SolverGA
+from solver_random_search import SolverRandomSearch
 
 app = Flask(__name__)
 
@@ -28,7 +30,7 @@ def text_response(text, quoted=None):
         }
 
 def solve_plain(problem, send):
-    solver = SolverPlain(problem)
+    solver = SolverGA(problem, lambda x: send(text_response(x)))
     send(text_response('계산 결과가 도착했습니다. 아무렇게나 나눠보고 제일 좋은 걸 찾은 거니까 혹시 맘에 안 들면 다시 계산을 시켜주세요!', solver.solve()))
 
 def validity_check(command, query, send):
