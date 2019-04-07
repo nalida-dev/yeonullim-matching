@@ -11,6 +11,8 @@ class Problem:
             # validity check
             # 1. 중복된 사람
             alphabet = [i[0] for i in args] 
+            is_generous = [i.startswith('진행') for i in alphabet]
+            alphabet = [i[2:] if i.startswith('진행') else i for i in alphabet]
             if len(alphabet) != len(set(alphabet)):
                 self.description = '뭔가 중복된 사람이 있는듯?'
                 return
@@ -43,12 +45,13 @@ class Problem:
 
             self.problem = {
                 'alphabet': alphabet,
+                'is_generous': is_generous,
                 'graph': [[alphabet.index(i[1]), alphabet.index(i[2])] for i in args]
             }
             
             descriptions = []
             for d_from, (d_to_1, d_to_2) in enumerate(self.problem['graph']):
-                descriptions.append('{} -> {}, {}'.format(alphabet[d_from], alphabet[d_to_1], alphabet[d_to_2]))
+                descriptions.append('{}{} -> {}, {}'.format(alphabet[d_from], '(진행자)' if is_generous[d_from] else '', alphabet[d_to_1], alphabet[d_to_2]))
             self.description = '\n'.join(descriptions)
         except:
             self.problem = None
